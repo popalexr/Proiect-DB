@@ -1,14 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const connection = require('express-myconnection');
 const mysql = require('mysql');
+const connection = require('express-myconnection');
+const cors = require('cors');
 
 const dbCredentials = require('./settings.json');
 
-const port = 8081;
-
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use(
     connection(mysql, {
@@ -37,6 +37,29 @@ app.get('/api/angajati', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.get('/api/angajati/:id', (req, res) => {
+    req.getConnection((err, connection) => {
+        if (err) {
+            res.status(500).json({"error": "Database error"});
+            return;
+        }
+
+        connection.query('SELECT ID_Angajat, Nume, Prenume, Functie FROM angajati WHERE ID_Angajat = ?', [req.params.id], (err, results) => {
+            if (err) {
+                res.status(500).json({"error": "Query error."});
+                return;
+            }
+
+            if (results.length === 0) {
+                res.status(404).json({"error": "Not found."});
+                return;
+            }
+
+            res.json(results[0]);
+        });
+    });
+});
+
+app.listen(8081, () => {
+    console.log('Server is running on port 8081');
 });

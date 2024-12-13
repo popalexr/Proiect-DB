@@ -28,7 +28,7 @@ const App = () => {
       <header className="App-header">
         <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
-        <div class="content">
+        <div className="content">
           {currentPage === 'home' && <Home />}
           {currentPage === 'angajati' && <Angajati />}
         </div>
